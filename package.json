@@ -4,7 +4,9 @@
   "description": "this is a consultancy website ",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "nodemon backend/server.js",
+    "start": "node backend/server.js",
+    "client": "npm run dev --prefix frontend"
   },
   "author": "prs-dev",
   "license": "ISC",
