@@ -8,3 +8,30 @@
 	box-sizing: border-box;
 	font-family: Arial, Helvetica, sans-serif;
 }
+
+.slick-slider {
+	width: 60%;
+	display: flex !important;
+}
+
+.slick-slider div {
+	display: flex !important;
+	gap: 20px;
+}
+
+.slick-slider section {
+	display: flex !important;
+	gap: 10px;
+	flex-direction: column;
+	border-radius: 10px;
+	overflow: hidden;
+	border: 1px solid #b6b4b4;
+}
+
+.slick-slider p{
+	text-align: center;
+}
+
+.slick-prev, .slick-next {
+	display: none !important;
+}

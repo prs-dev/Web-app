@@ -14,7 +14,13 @@ export default {
     fontFamily: {
       'roboto': ['Roboto', "Arial", "sans-serif"]
     },
-    extend: {},
+    extend: {
+      colors: {
+        navColor: "#322f20",
+        mainColor: "#634e37",
+        contentColor: "#4e4635"
+      }
+    },
   },
   plugins: [],
 }
