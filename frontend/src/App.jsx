@@ -10,6 +10,10 @@ import Services from "./pages/Services"
 import Vastu from "./pages/Vastu"
 import Contact from "./pages/Contact"
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import { ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Appointment from "./pages/Appointment"
+import Success from "./pages/Success"
 
 
 const App = () => {
@@ -20,6 +24,7 @@ const App = () => {
         <Navbar />
       </nav>
       <main>
+        <ToastContainer/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -30,6 +35,8 @@ const App = () => {
         <Route path="/services" element={<Services />} />
         <Route path="/vastu" element={<Vastu />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/appointment" element={<Appointment />} />
+        <Route path="/success" element={<Success />} />
       </Routes>
       </main>
       <footer>

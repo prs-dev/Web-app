@@ -1,6 +1,32 @@
-import React from 'react'
+import React, { useState } from 'react'
+import {toast} from 'react-toastify'
+import {motion} from 'framer-motion'
+import axios from 'axios'
+
+const url = 'http://localhost:4000'
 
 const Legal = () => {
+  const [data, setData] = useState({
+    mobile: '',
+    message: ''
+  })
+
+  const handleSubmit = async(e) => {
+    e.preventDefault()
+    axios.post(`${url}/api/contact-one`, data)
+    .then(res => {
+        console.log(res)
+        setData({
+            mobile: '',
+            message: ''
+        })
+        toast.success("Thankyou for contacting, Someone will get in touch shortly")
+    })
+    .catch(e => {
+        console.error(e.message)
+        toast.error("Please fill out all the fields!")
+    })
+}
   return (
     <div>
       <div className='relative'>
@@ -132,10 +158,10 @@ const Legal = () => {
             <button className='bg-mainColor  py-2 px-4 rounded-full text-white my-2'>Book Appointment</button>
           </div>
           <div className="flex-1 shadow-2xl rounded-md h-[70%]">
-            <form className='flex h-[70%] p-2 flex-col gap-4 justify-between'>
-              <input type="text" placeholder='Mobile Number' />
-              <textarea cols="30" rows="5" placeholder='Message...'></textarea>
-              <input type="Submit" value="Submit" className='bg-mainColor text-white' />
+            <form onSubmit={handleSubmit} className='flex h-[70%] p-2 flex-col gap-4 justify-between'>
+              <input className='border rounded-md p-1' value={data.mobile} onChange={e => setData(prev => ({...prev, mobile: e.target.value}))} type="number" placeholder='Mobile Number' />
+              <textarea className='border rounded-md p-1' value={data.message} onChange={e => setData(prev => ({...prev, message: e.target.value}))} cols="30" rows="5" placeholder='Message...'></textarea>
+              <motion.input whileHover={{ scale: 1.02 }} whileTap={{ scale: .97 }}  type="submit" value="Submit" className='bg-mainColor text-white' />
             </form>
           </div>
           <div className='flex-1 flex flex-col items-left gap-[20px]'>

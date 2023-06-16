@@ -19,7 +19,7 @@ export default {
         navColor: "#322f20",
         mainColor: "#634e37",
         contentColor: "#4e4635"
-      }
+      },
     },
   },
   plugins: [],

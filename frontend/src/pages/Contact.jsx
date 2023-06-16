@@ -1,6 +1,45 @@
-import React from 'react'
+import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
+import { useEffect, useRef, useState } from "react";
+import {motion} from 'framer-motion'
+import axios from 'axios'
+import {toast} from 'react-toastify'
+
+const url = 'http://localhost:4000'
 
 const Contact = () => {
+  const markerRef = useRef()
+  const [data, setData] = useState({
+    name: '',
+    mobile: '',
+    location: '',
+    message: ''
+  })
+
+  useEffect(() => { setTimeout(() => markerRef?.current?.openPopup(), 1000) }, [])
+
+  const handleSubmit = async(e) => {
+    e.preventDefault()
+    axios.post(`${url}/api/contact-two`, data)
+    .then(res => {
+        console.log(res)
+        setData({
+            name: '',
+            mobile: '',
+            location: '',
+            message: ''
+        })
+        toast.success("Thankyou for contacting, Someone will get in touch shortly")
+    })
+    .catch(e => {
+        console.error(e.message)
+        toast.error("Please fill out all the fields!")
+    })
+}
+
+  // useEffect(() => {
+  //   markerRef.leftletElement.openPopup()
+  // },[])
+
   return (
     <div className=''>
       <div className='relative'>
@@ -24,20 +63,34 @@ const Contact = () => {
                 <br /><span className='underline py-2'>Website:</span> Visit our website at www.sahaiconsultancy.com to explore our services and fill out the contact form.</p>
             </div>
             <div className="flex-1  object-cover shadow-2xl rounded-md">
-              <form className='h-[50vh] flex flex-col justify-between gap-[10px] p-[10px]'>
-                <input className='border p-2' type="text" placeholder='Name' />
-                <input className='border p-2' type="text" placeholder='Mobile Number' />
-                <input className='border p-2' type="text" placeholder='Location' />
-                <textarea className='border p-2' cols="30" rows="5" placeholder='Message...'></textarea>
-                <input className='border p-2 text-mainColor font-semibold' type="Submit" value="Submit" />
+              <form onSubmit={handleSubmit} className='h-[50vh] flex flex-col justify-between gap-[10px] p-[10px]'>
+                <input className='border p-2' type="text" placeholder='Name' value={data?.name} onChange={(e) => setData(prev => ({ ...prev, name: e.target.value }))}/>
+                <input className='border p-2' type="text" placeholder='Mobile Number' value={data?.mobile} onChange={(e) => setData(prev => ({ ...prev, mobile: e.target.value }))} />
+                <input className='border p-2' type="text" placeholder='Location' value={data?.location} onChange={(e) => setData(prev => ({ ...prev, location: e.target.value }))}/>
+                <textarea className='border p-2' cols="30" rows="5" placeholder='Message...' value={data?.message} onChange={(e) => setData(prev => ({ ...prev, message: e.target.value }))}></textarea>
+                <motion.input whileHover={{ scale: 1.02 }} whileTap={{ scale: .97 }} className='border p-2 text-mainColor font-semibold' type="Submit" value="Submit" />
 
               </form>
             </div>
           </div>
         </div>
+
+        {/* map */}
+        <div className="h-[50vh] my-10 shadow-lg border p-2">
+          <MapContainer center={[26.8467, 80.9462]} zoom={13} scrollWheelZoom={true}>
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker ref={markerRef} position={[26.8467, 80.9462]}>
+              <Popup>
+                <div className="text-2xl text-mainColor text-center">Yassh Consultancy Services</div>
+              </Popup>
+            </Marker>
+          </MapContainer>
+        </div>
       </div>
-      {/* map */}
-      <div></div>
+
     </div>
   )
 }

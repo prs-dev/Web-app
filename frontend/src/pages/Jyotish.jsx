@@ -1,7 +1,26 @@
-import React from 'react'
+import { useState, useEffect } from 'react'
 import Slider from 'react-slick'
+import { motion } from 'framer-motion'
+import axios from 'axios'
+import {toast} from 'react-toastify'
+import {useNavigate} from 'react-router-dom'
 
 const Jyotish = () => {
+  const navigate = useNavigate()
+
+  const [clicked, setClicked] = useState({
+    one: false,
+    two: false,
+  })
+  const [data, setData] = useState({
+    name: '',
+    mobile: '',
+    location: '',
+    message: ''
+  })
+  const [horo, setHoro] = useState(null)
+  const [date, setDate] = useState(null)
+
   const settings = {
     infinite: true,
     slidesToShow: 4,
@@ -13,6 +32,46 @@ const Jyotish = () => {
     pauseOnHover: true
   }
 
+  const url = "http://localhost:4000"
+
+  const getHoroscope = async () => {
+    const info = date?.toLocaleString("en")?.split(",")[0]?.split("/")
+    const day = Number(info[1])
+    const month = Number(info[0])
+    const year = Number(info[2])
+    try {
+      const res = await axios.post(`${url}/api/get-astro`, { day, month, year })
+      setHoro(res?.data?.data)
+      setClicked(prev => ({ ...prev, two: true }))
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
+
+  const handleSubmit = async(e) => {
+    e.preventDefault()
+    axios.post(`${url}/api/contact-two`, data)
+    .then(res => {
+        console.log(res)
+        setData({
+            name: '',
+            mobile: '',
+            location: '',
+            message: ''
+        })
+        toast.success("Thankyou for contacting, Someone will get in touch shortly")
+    })
+    .catch(e => {
+        console.error(e.message)
+        toast.error("Please fill out all the fields!")
+    })
+}
+
+  console.log(data)
+
+  // console.log(date?.toLocaleString("en")?.split(",")[0]?.split("/"))
+
   return (
     <div>
       <div className='relative h-[50vh] overflow-hidden'>
@@ -22,6 +81,36 @@ const Jyotish = () => {
         </video>
         <div className='absolute -z-10 top-0 left-0 bg-gradient-to-t from-mainColor to-contentColor w-full h-[50vh]'></div>
         <h2 className='absolute bottom-0 text-3xl bg-mainColor flex items-center justify-center text-white p-1 m-10 w-[20%]'>Bhartiya Jyotish</h2>
+
+        {!clicked.one && <motion.div onClick={() => setClicked(prev => ({ ...prev, one: true }))} animate={{
+          translateY: [10, 20, 10]
+        }} transition={{ ease: "linear", duration: 3, repeat: Infinity }} className='absolute top-[10px] right-[10px] rounded-md  bg-white h-[3rem] flex items-center p-2 text-mainColor cursor-pointer'>
+          Get Your Free Horoscope Now!
+        </motion.div>}
+
+        {clicked.one && <motion.div initial={{ scale: .5 }}
+          whileInView={{ scale: 1.05 }} className='absolute top-[10px] right-[10px] rounded-md bg-white h-[7rem] flex flex-col items-center justify-between gap-2 p-2'>
+          <label htmlFor="date" className='text-mainColor font-semibold'>Select a date</label>
+          <input className='border' type="date" onChange={(e) => setDate(new Date(e.target.value))} />
+          <motion.button onClick={getHoroscope} className='bg-mainColor text-white rounded-md p-1'>Generate</motion.button>
+        </motion.div>}
+
+        {clicked.two && <motion.div initial={{ scale: .5 }}
+          whileInView={{ scale: 1.05 }} className='absolute top-[10px] right-[10px] rounded-md bg-white h-[14 rem] w-[20%] p-2'>
+          <div id="test">
+            <p><span className='font-bold text-mainColor'>Birth Dasha:</span> {horo?.birthDasha}</p>
+            <p><span className='font-bold text-mainColor'>Birth Time: </span>{horo?.birthTime}</p>
+            <p><span className='font-bold text-mainColor'>Nakshatra: </span>{horo?.nakshatra}</p>
+            <p><span className='font-bold text-mainColor'>Rashi: </span>{horo?.rashi}</p>
+            <p><span className='font-bold text-mainColor'>Prediction: </span>{horo?.prediction}</p>
+          </div>
+          <p className='font-semibold text-mainColor p-2'>Want more or get personalized Horoscope</p>
+          <motion.button whileHover={{ scale: 1.05 }} onClick={() => {
+            setClicked(prev => ({ ...prev, two: false, one: false }))
+            navigate("/appointment")
+          }} className='bg-mainColor p-2 text-white rounded-md'>Click Here</motion.button>
+        </motion.div>}
+
       </div>
       <div className='w-[70%] mx-auto'>
         <div className='flex gap-4 items-center justify-center my-10'>
@@ -115,12 +204,12 @@ const Jyotish = () => {
             <img src="/assets/jyotish.jpeg" alt="" />
           </div>
           <div className="flex-1  object-cover shadow-2xl rounded-md">
-            <form className='h-full flex flex-col gap-[10px] p-[10px]'>
-              <input type="text" placeholder='Name' />
-              <input type="text" placeholder='Mobile Number' />
-              <input type="text" placeholder='Location' />
-              <textarea cols="30" rows="5" placeholder='Message...'></textarea>
-              <input type="Submit" value="Submit" className='text-white bg-mainColor p-1' />
+            <form onSubmit={handleSubmit} className='flex flex-col gap-[10px] p-[10px]'>
+              <input className='border p-1 rounded-md' type="text" placeholder='Name' value={data?.name} onChange={(e) => setData(prev => ({ ...prev, name: e.target.value }))} />
+              <input className='border p-1 rounded-md' type="number" placeholder='Mobile Number' value={data?.mobile} onChange={(e) => setData(prev => ({ ...prev, mobile: e.target.value }))} />
+              <input className='border p-1 rounded-md' type="text" placeholder='Location' value={data?.location} onChange={(e) => setData(prev => ({ ...prev, location: e.target.value }))} />
+              <textarea className='border p-1 rounded-md' cols="30" rows="5" placeholder='Message...' value={data?.message} onChange={(e) => setData(prev => ({ ...prev, message: e.target.value }))}></textarea>
+              <motion.input whileHover={{ scale: 1.02 }} whileTap={{ scale: .97 }} type="submit" value="Submit" className='text-white bg-mainColor' />
 
             </form>
           </div>

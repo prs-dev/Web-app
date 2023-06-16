@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import {toast} from 'react-toastify'
+import {motion} from 'framer-motion'
 
 const arr = [
     {
@@ -15,8 +18,17 @@ const arr = [
     },
 ]
 
+const url = 'http://localhost:4000'
+
 const Home = () => {
     const [index, setIndex] = useState(1)
+    const [data, setData] = useState({
+        name: '',
+        mobile: '',
+        location: '',
+        message: ''
+    })
+
     useEffect(() => {
         const interval = () => {
             if (index === 2) {
@@ -28,6 +40,30 @@ const Home = () => {
         setTimeout(interval, 5000)
         return () => clearTimeout(interval)
     }, [index])
+
+    const handleSubmit = async(e) => {
+        e.preventDefault()
+        // console.log(e)
+        e.preventDefault()
+        axios.post(`${url}/api/contact-two`, data)
+        .then(res => {
+            console.log(res)
+            setData({
+                name: '',
+                mobile: '',
+                location: '',
+                message: ''
+            })
+            toast.success("Thankyou for contacting, Someone will get in touch shortly")
+        })
+        .catch(e => {
+            console.error(e.message)
+            toast.error("Please fill out all the fields!")
+        })
+    }
+
+    // toast.success("hello")
+
     return (
         <div>
             <div className="relative h-[calc(100vh-70px)]">
@@ -171,12 +207,12 @@ const Home = () => {
                         </span>
                     </div>
                     <div className="flex-1  object-cover shadow-2xl rounded-md">
-                        <form className='flex flex-col gap-[10px] p-[10px]'>
-                            <input type="text" placeholder='Name' />
-                            <input type="text" placeholder='Mobile Number' />
-                            <input type="text" placeholder='Location' />
-                            <textarea cols="30" rows="5" placeholder='Message...'></textarea>
-                            <input type="Submit" value="Submit" className='text-white' />
+                        <form onSubmit={handleSubmit} className='flex flex-col gap-[10px] p-[10px]'>
+                            <input type="text" placeholder='Name' value={data?.name} onChange={(e) => setData(prev => ({...prev, name: e.target.value}))} />
+                            <input type="number" placeholder='Mobile Number' value={data?.mobile} onChange={(e) => setData(prev => ({...prev, mobile: e.target.value}))}/>
+                            <input type="text" placeholder='Location' value={data?.location} onChange={(e) => setData(prev => ({...prev, location: e.target.value}))}/>
+                            <textarea cols="30" rows="5" placeholder='Message...' value={data?.message} onChange={(e) => setData(prev => ({...prev, message: e.target.value}))}></textarea>
+                            <motion.input whileHover={{scale: 1.1}} whileTap={{scale: .9}} type="submit" value="Submit" className='text-white' />
 
                         </form>
                     </div>
